@@ -1,0 +1,8 @@
+{
+  "name": "app-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/HomeFreelasOrg/app-api.git",
+  "author": "IsraelCost <cmteisrael@gmail.com>",
+  "license": "MIT"
+}
