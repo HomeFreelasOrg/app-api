@@ -4,5 +4,8 @@
   "main": "index.js",
   "repository": "https://github.com/HomeFreelasOrg/app-api.git",
   "author": "IsraelCost <cmteisrael@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "git-commit-msg-linter": "^4.1.3"
+  }
 }
