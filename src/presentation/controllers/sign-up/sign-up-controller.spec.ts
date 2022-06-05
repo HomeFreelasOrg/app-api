@@ -1,3 +1,5 @@
+import { MissingParamError } from "../../errors";
+import { badRequest } from "../../helpers";
 import { HttpRequest } from "../../protocols";
 import { SignUpController } from "./sign-up-controller";
 
@@ -30,5 +32,23 @@ describe("SignUpController", () => {
     const request = fakerRequest;
     sut.handle(request);
     expect(handleSpy).toHaveBeenCalledWith(request);
+  });
+
+  test("Should return 400 if missing params", async () => {
+    const { sut } = makeSut();
+    const request = { body: {} };
+    const response = await sut.handle(request);
+    expect(response).toEqual(
+      badRequest(
+        new MissingParamError([
+          "name",
+          "age",
+          "birth",
+          "address",
+          "email",
+          "password",
+        ])
+      )
+    );
   });
 });
