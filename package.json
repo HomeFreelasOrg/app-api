@@ -32,14 +32,14 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "npm run test:ci"
+      "pre-commit": "yarn lint-staged",
+      "pre-push": "yarn test:ci"
     }
   },
   "lint-staged": {
     "*.ts": [
       "eslint 'src/**/' --fix",
-      "npm run test:staged",
+      "yarn test:staged",
       "git add"
     ]
   }
