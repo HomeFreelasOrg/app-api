@@ -1,5 +1,9 @@
-import { MissingParamError, InvalidParamError } from "../../errors";
-import { badRequest } from "../../helpers";
+import {
+  MissingParamError,
+  InvalidParamError,
+  ServerError,
+} from "../../errors";
+import { badRequest, serverError } from "../../helpers";
 import { EmailValidator, HttpRequest } from "../../protocols";
 import { SignUpController } from "./sign-up-controller";
 
@@ -68,7 +72,6 @@ describe("SignUpController", () => {
   test("Should SignUpController calls EmailValidator with correct values", async () => {
     const { sut, emailValidatorStub } = makeSut();
     const request = { body: { ...fakerRequest.body, email: "invalid_mail" } };
-    console.log(request);
     const validateSpy = jest
       .spyOn(emailValidatorStub, "validate")
       .mockReturnValue(false);
@@ -82,5 +85,15 @@ describe("SignUpController", () => {
     jest.spyOn(emailValidatorStub, "validate").mockReturnValue(false);
     const response = await sut.handle(request);
     expect(response).toEqual(badRequest(new InvalidParamError("email")));
+  });
+
+  test("Should return 500 if EmailValidator throws", async () => {
+    const { sut, emailValidatorStub } = makeSut();
+    const request = fakerRequest;
+    jest.spyOn(emailValidatorStub, "validate").mockImplementation(() => {
+      throw new Error();
+    });
+    const response = await sut.handle(request);
+    expect(response).toEqual(serverError(new Error()));
   });
 });
