@@ -1,6 +1,6 @@
 import { AddUser } from "../../../domain/usecases";
 import { MissingParamError, InvalidParamError } from "../../errors";
-import { badRequest, serverError } from "../../helpers";
+import { badRequest, ok, serverError } from "../../helpers";
 import { EmailValidator, HttpRequest } from "../../protocols";
 import { SignUpController } from "./sign-up-controller";
 
@@ -13,7 +13,7 @@ interface SutTypes {
 const makeAddUser = (): AddUser => {
   class AddUserStub implements AddUser {
     add(user: AddUser.Params): Promise<AddUser.Result> {
-      return new Promise((res) => res(null));
+      return new Promise((res) => res({ ...user, id: "any_id" }));
     }
   }
 
@@ -120,5 +120,22 @@ describe("SignUpController", () => {
       email: "any_email@mail.com",
       password: "any_password",
     });
+  });
+
+  test("Should return 200 on success", async () => {
+    const { sut } = makeSut();
+    const request = fakerRequest;
+    const response = await sut.handle(request);
+    expect(response).toEqual(
+      ok({
+        id: "any_id",
+        name: "any_name",
+        age: 10,
+        birth: new Date(2000, 9, 20),
+        address: "any_address",
+        email: "any_email@mail.com",
+        password: "any_password",
+      })
+    );
   });
 });
