@@ -65,9 +65,20 @@ describe("SignUpController", () => {
     );
   });
 
+  test("Should emailValidatorStub calls validate with correct values", async () => {
+    const { sut, emailValidatorStub } = makeSut();
+    const request = { body: { ...fakerRequest.body, email: "invalid_mail" } };
+    console.log(request);
+    const validateSpy = jest
+      .spyOn(emailValidatorStub, "validate")
+      .mockReturnValue(false);
+    await sut.handle(request);
+    expect(validateSpy).toHaveBeenCalledWith("invalid_mail");
+  });
+
   test("Should return 400 if email is invalid", async () => {
     const { sut, emailValidatorStub } = makeSut();
-    const request = { ...fakerRequest, email: "invalid_mail" };
+    const request = { body: { ...fakerRequest.body, email: "invalid_mail" } };
     jest.spyOn(emailValidatorStub, "validate").mockReturnValue(false);
     const response = await sut.handle(request);
     expect(response).toEqual(badRequest(new InvalidParamError("email")));
