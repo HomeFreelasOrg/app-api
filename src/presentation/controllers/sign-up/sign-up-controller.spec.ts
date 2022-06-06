@@ -65,7 +65,7 @@ describe("SignUpController", () => {
     );
   });
 
-  test("Should emailValidatorStub calls validate with correct values", async () => {
+  test("Should SignUpController calls EmailValidator with correct values", async () => {
     const { sut, emailValidatorStub } = makeSut();
     const request = { body: { ...fakerRequest.body, email: "invalid_mail" } };
     console.log(request);
