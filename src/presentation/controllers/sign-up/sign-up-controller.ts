@@ -1,6 +1,6 @@
 import { AddUser } from "../../../domain/usecases";
 import { InvalidParamError, MissingParamError } from "../../errors";
-import { badRequest, serverError } from "../../helpers";
+import { badRequest, ok, serverError } from "../../helpers";
 import {
   Controller,
   HttpRequest,
@@ -41,7 +41,9 @@ export class SignUpController implements Controller {
         return badRequest(new InvalidParamError("email"));
       }
 
-      await this.addUser.add(httpRequest.body);
+      const newUser = await this.addUser.add(httpRequest.body);
+
+      return ok(newUser);
     } catch (error) {
       return serverError(error);
     }

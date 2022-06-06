@@ -1,3 +1,5 @@
+import { User } from "../models/user";
+
 export interface AddUser {
   add(user: AddUser.Params): Promise<AddUser.Result>;
 }
@@ -12,5 +14,5 @@ export namespace AddUser {
     password: string;
   }
 
-  export type Result = boolean;
+  export type Result = User;
 }
