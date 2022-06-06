@@ -28,19 +28,7 @@
     "test:unit": "npm test -- --watch -c jest-unit-config.js",
     "test:integration": "npm test -- --watch -c jest-integration-config.js",
     "test:staged": "npm test -- --findRelatedTests",
-    "test:ci": "npm test -- --coverage"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn lint-staged",
-      "pre-push": "yarn test:ci"
-    }
-  },
-  "lint-staged": {
-    "*.ts": [
-      "eslint 'src/**/' --fix",
-      "yarn test:staged",
-      "git add"
-    ]
+    "test:ci": "npm test -- --coverage",
+    "prepare": "husky install"
   }
 }
