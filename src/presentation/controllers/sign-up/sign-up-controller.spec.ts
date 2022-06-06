@@ -1,8 +1,5 @@
-import {
-  MissingParamError,
-  InvalidParamError,
-  ServerError,
-} from "../../errors";
+import { AddUser } from "../../../domain/usecases";
+import { MissingParamError, InvalidParamError } from "../../errors";
 import { badRequest, serverError } from "../../helpers";
 import { EmailValidator, HttpRequest } from "../../protocols";
 import { SignUpController } from "./sign-up-controller";
@@ -10,7 +7,18 @@ import { SignUpController } from "./sign-up-controller";
 interface SutTypes {
   sut: SignUpController;
   emailValidatorStub: EmailValidator;
+  addUserStub: AddUser;
 }
+
+const makeAddUser = (): AddUser => {
+  class AddUserStub implements AddUser {
+    add(user: AddUser.Params): Promise<AddUser.Result> {
+      return new Promise((res) => res(null));
+    }
+  }
+
+  return new AddUserStub();
+};
 
 const makeEmailValidator = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
@@ -24,10 +32,12 @@ const makeEmailValidator = (): EmailValidator => {
 
 const makeSut = (): SutTypes => {
   const emailValidatorStub = makeEmailValidator();
-  const sut = new SignUpController(emailValidatorStub);
+  const addUserStub = makeAddUser();
+  const sut = new SignUpController(emailValidatorStub, addUserStub);
   return {
     sut,
     emailValidatorStub,
+    addUserStub,
   };
 };
 
@@ -35,7 +45,7 @@ const fakerRequest: HttpRequest = {
   body: {
     name: "any_name",
     age: 10,
-    birth: new Date(),
+    birth: new Date(2000, 9, 20),
     address: "any_address",
     email: "any_email@mail.com",
     password: "any_password",
@@ -95,5 +105,20 @@ describe("SignUpController", () => {
     });
     const response = await sut.handle(request);
     expect(response).toEqual(serverError(new Error()));
+  });
+
+  test("Should SignUpController calls addUserStub with correct values", async () => {
+    const { sut, addUserStub } = makeSut();
+    const request = fakerRequest;
+    const addSpy = jest.spyOn(addUserStub, "add");
+    await sut.handle(request);
+    expect(addSpy).toHaveBeenCalledWith({
+      name: "any_name",
+      age: 10,
+      birth: new Date(2000, 9, 20),
+      address: "any_address",
+      email: "any_email@mail.com",
+      password: "any_password",
+    });
   });
 });
