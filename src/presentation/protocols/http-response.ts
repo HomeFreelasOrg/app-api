@@ -1,6 +1,6 @@
-import { StatusCode } from ".";
+import { StatusCode } from '.'
 
 export interface HttpResponse {
-  body: any;
-  statusCode: StatusCode;
+  body: any
+  statusCode: StatusCode
 }
