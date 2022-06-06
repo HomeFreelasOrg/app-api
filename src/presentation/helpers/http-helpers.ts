@@ -11,7 +11,7 @@ export const serverError = (error: Error): HttpResponse => ({
   statusCode: StatusCode.SERVER_ERROR,
 });
 
-export const ok = (data: any): HttpResponse => ({
-  body: data,
+export const ok = (body: any): HttpResponse => ({
+  body,
   statusCode: StatusCode.OK,
 });
