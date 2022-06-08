@@ -1,9 +1,11 @@
 import { AddUser } from '../../../domain/usecases'
 import { UnderageError } from '../../errors'
+import { Encrypter } from '../../protocols'
 import { DBAddUser } from './db-add-user'
 
 interface SutTypes {
   sut: DBAddUser
+  encrypterStub: Encrypter
 }
 
 const fakerUser: AddUser.Params = {
@@ -15,10 +17,21 @@ const fakerUser: AddUser.Params = {
   password: 'any_password'
 }
 
+const makeEncrypter = (): Encrypter => {
+  class EncrypterStub implements Encrypter {
+    encrypt (valueToEncrypt: string): string {
+      return 'encrypted_value'
+    }
+  }
+  return new EncrypterStub()
+}
+
 const makeSut = (): SutTypes => {
-  const sut = new DBAddUser()
+  const encrypterStub = makeEncrypter()
+  const sut = new DBAddUser(encrypterStub)
   return {
-    sut
+    sut,
+    encrypterStub
   }
 }
 
@@ -30,12 +43,19 @@ describe('DBAddUser', () => {
     expect(addSpy).toHaveBeenCalledWith(fakerUser)
   })
 
-  test('Should return an UnderAgeError if the user\'s age is less than 16 years', async () => {
+  test('Should throws an UnderageError if the user\'s age is less than 16 years', async () => {
     try {
       const { sut } = makeSut()
       await sut.add({ ...fakerUser, birth: new Date(2008, 8, 12) })
     } catch (error) {
       expect(error).toEqual(new UnderageError())
     }
+  })
+
+  test('Should call Encrypter with correct password', async () => {
+    const { sut, encrypterStub } = makeSut()
+    const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
+    await sut.add(fakerUser)
+    expect(encryptSpy).toHaveBeenCalledWith(fakerUser.password)
   })
 })
