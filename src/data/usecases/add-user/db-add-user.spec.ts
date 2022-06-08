@@ -1,12 +1,13 @@
 import { AddUser } from '../../../domain/usecases'
 import { UnderageError } from '../../errors'
-import { AddUserRepository, Encrypter } from '../../protocols'
+import { AddUserRepository, CheckUserExistsByEmailRepository, Encrypter } from '../../protocols'
 import { DBAddUser } from './db-add-user'
 
 interface SutTypes {
   sut: DBAddUser
   encrypterStub: Encrypter
   addUserRepositoryStub: AddUserRepository
+  checkUserExistsByEmailRepository: CheckUserExistsByEmailRepository
 }
 
 const fakerUser: AddUser.Params = {
@@ -16,6 +17,15 @@ const fakerUser: AddUser.Params = {
   email: 'any_mail@mail.com',
   birth: new Date(2000, 9, 5),
   password: 'any_password'
+}
+
+const makeCheckUserExistsByEmailRepository = (): CheckUserExistsByEmailRepository => {
+  class CheckUserExistsByEmailRepositoryStub implements CheckUserExistsByEmailRepository {
+    async check (email: string): Promise<boolean> {
+      return new Promise((resolve) => resolve(true))
+    }
+  }
+  return new CheckUserExistsByEmailRepositoryStub()
 }
 
 const makeAddUserRepository = (): AddUserRepository => {
@@ -40,13 +50,15 @@ const makeEncrypter = (): Encrypter => {
 }
 
 const makeSut = (): SutTypes => {
+  const checkUserExistsByEmailRepository = makeCheckUserExistsByEmailRepository()
   const addUserRepositoryStub = makeAddUserRepository()
   const encrypterStub = makeEncrypter()
-  const sut = new DBAddUser(encrypterStub, addUserRepositoryStub)
+  const sut = new DBAddUser(encrypterStub, addUserRepositoryStub, checkUserExistsByEmailRepository)
   return {
     sut,
     encrypterStub,
-    addUserRepositoryStub
+    addUserRepositoryStub,
+    checkUserExistsByEmailRepository
   }
 }
 
@@ -100,5 +112,12 @@ describe('DBAddUser', () => {
     const { sut } = makeSut()
     const user = await sut.add(fakerUser)
     expect(user).toEqual({ ...fakerUser, id: 'any_id', password: 'encrypted_value' })
+  })
+
+  test('Should call CheckUserExistsByEmailRepository with correct email', async () => {
+    const { sut, checkUserExistsByEmailRepository } = makeSut()
+    const checkSpy = jest.spyOn(checkUserExistsByEmailRepository, 'check')
+    await sut.add(fakerUser)
+    expect(checkSpy).toHaveBeenCalledWith(fakerUser.email)
   })
 })
