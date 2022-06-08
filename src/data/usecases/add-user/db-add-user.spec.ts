@@ -95,4 +95,10 @@ describe('DBAddUser', () => {
     const promise = sut.add(fakerUser)
     expect(promise).rejects.toThrow(new Error())
   })
+
+  test('Should return user on success', async () => {
+    const { sut } = makeSut()
+    const user = await sut.add(fakerUser)
+    expect(user).toEqual({ ...fakerUser, id: 'any_id', password: 'encrypted_value' })
+  })
 })
