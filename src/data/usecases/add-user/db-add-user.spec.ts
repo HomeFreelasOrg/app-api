@@ -120,4 +120,13 @@ describe('DBAddUser', () => {
     await sut.add(fakerUser)
     expect(checkSpy).toHaveBeenCalledWith(fakerUser.email)
   })
+
+  test('Should throws if CheckUserExistsByEmailRepository throws', () => {
+    const { sut, checkUserExistsByEmailRepository } = makeSut()
+    jest.spyOn(checkUserExistsByEmailRepository, 'check').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const promise = sut.add(fakerUser)
+    expect(promise).rejects.toThrow(new Error())
+  })
 })
