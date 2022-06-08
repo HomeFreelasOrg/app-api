@@ -86,4 +86,13 @@ describe('DBAddUser', () => {
     const promise = sut.add(fakerUser)
     expect(promise).rejects.toThrow(new Error())
   })
+
+  test('Should throws if AddUserRepository throws', () => {
+    const { sut, addUserRepositoryStub } = makeSut()
+    jest.spyOn(addUserRepositoryStub, 'create').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const promise = sut.add(fakerUser)
+    expect(promise).rejects.toThrow(new Error())
+  })
 })
