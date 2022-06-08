@@ -15,8 +15,8 @@ export class DBAddUser implements AddUser {
 
     const encryptedPassword = this.encrypter.encrypt(user.password)
 
-    await this.addUserRepository.create({ ...user, password: encryptedPassword })
+    const createdUser = await this.addUserRepository.create({ ...user, password: encryptedPassword })
 
-    return new Promise((resolve) => resolve(null))
+    return createdUser
   }
 }
