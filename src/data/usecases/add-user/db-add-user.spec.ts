@@ -1,11 +1,12 @@
 import { AddUser } from '../../../domain/usecases'
 import { UnderageError } from '../../errors'
-import { Encrypter } from '../../protocols'
+import { AddUserRepository, Encrypter } from '../../protocols'
 import { DBAddUser } from './db-add-user'
 
 interface SutTypes {
   sut: DBAddUser
   encrypterStub: Encrypter
+  addUserRepositoryStub: AddUserRepository
 }
 
 const fakerUser: AddUser.Params = {
@@ -15,6 +16,18 @@ const fakerUser: AddUser.Params = {
   email: 'any_mail@mail.com',
   birth: new Date(2000, 9, 5),
   password: 'any_password'
+}
+
+const makeAddUserRepository = (): AddUserRepository => {
+  class AddUserRepositoryStub implements AddUserRepository {
+    async create (user: AddUser.Params): Promise<AddUser.Result> {
+      return new Promise((resolve) => resolve({
+        id: 'any_id',
+        ...user
+      }))
+    }
+  }
+  return new AddUserRepositoryStub()
 }
 
 const makeEncrypter = (): Encrypter => {
@@ -27,11 +40,13 @@ const makeEncrypter = (): Encrypter => {
 }
 
 const makeSut = (): SutTypes => {
+  const addUserRepositoryStub = makeAddUserRepository()
   const encrypterStub = makeEncrypter()
-  const sut = new DBAddUser(encrypterStub)
+  const sut = new DBAddUser(encrypterStub, addUserRepositoryStub)
   return {
     sut,
-    encrypterStub
+    encrypterStub,
+    addUserRepositoryStub
   }
 }
 
@@ -57,5 +72,12 @@ describe('DBAddUser', () => {
     const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
     await sut.add(fakerUser)
     expect(encryptSpy).toHaveBeenCalledWith(fakerUser.password)
+  })
+
+  test('Should call AddUserRepository with correct values', async () => {
+    const { sut, addUserRepositoryStub } = makeSut()
+    const createSpy = jest.spyOn(addUserRepositoryStub, 'create')
+    await sut.add(fakerUser)
+    expect(createSpy).toHaveBeenCalledWith({ ...fakerUser, password: 'encrypted_value' })
   })
 })
