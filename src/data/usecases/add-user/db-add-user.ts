@@ -1,5 +1,5 @@
 import { AddUser } from '../../../domain/usecases'
-import { UnderageError } from '../../errors'
+import { EmailAlrearyInUseError, UnderageError } from '../../errors'
 import { AddUserRepository, CheckUserExistsByEmailRepository, Encrypter } from '../../protocols'
 import { getAgeByBirth } from '../../services'
 
@@ -17,7 +17,11 @@ export class DBAddUser implements AddUser {
       return new Promise((resolve, reject) => reject(new UnderageError()))
     }
 
-    await this.checkUserExistsByEmailRepository.check(user.email)
+    const userAlreadyExists = await this.checkUserExistsByEmailRepository.check(user.email)
+
+    if (userAlreadyExists) {
+      return new Promise((resolve, reject) => reject(new EmailAlrearyInUseError()))
+    }
 
     const encryptedPassword = this.encrypter.encrypt(user.password)
 
