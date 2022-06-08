@@ -58,13 +58,10 @@ describe('DBAddUser', () => {
     expect(addSpy).toHaveBeenCalledWith(fakerUser)
   })
 
-  test('Should throws an UnderageError if the user\'s age is less than 16 years', async () => {
-    try {
-      const { sut } = makeSut()
-      await sut.add({ ...fakerUser, birth: new Date(2008, 8, 12) })
-    } catch (error) {
-      expect(error).toEqual(new UnderageError())
-    }
+  test('Should throws an UnderageError if the user\'s age is less than 16 years', () => {
+    const { sut } = makeSut()
+    const promise = sut.add({ ...fakerUser, birth: new Date(2008, 8, 12) })
+    expect(promise).rejects.toThrow(new UnderageError())
   })
 
   test('Should call Encrypter with correct password', async () => {
@@ -79,5 +76,14 @@ describe('DBAddUser', () => {
     const createSpy = jest.spyOn(addUserRepositoryStub, 'create')
     await sut.add(fakerUser)
     expect(createSpy).toHaveBeenCalledWith({ ...fakerUser, password: 'encrypted_value' })
+  })
+
+  test('Should throws if Encrypter throws', () => {
+    const { sut, encrypterStub } = makeSut()
+    jest.spyOn(encrypterStub, 'encrypt').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const promise = sut.add(fakerUser)
+    expect(promise).rejects.toThrow(new Error())
   })
 })
