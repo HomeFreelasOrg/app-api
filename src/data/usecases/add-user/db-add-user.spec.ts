@@ -1,5 +1,5 @@
 import { AddUser } from '../../../domain/usecases'
-import { UnderageError } from '../../errors'
+import { EmailAlrearyInUseError, UnderageError } from '../../errors'
 import { AddUserRepository, CheckUserExistsByEmailRepository, Encrypter } from '../../protocols'
 import { DBAddUser } from './db-add-user'
 
@@ -22,7 +22,7 @@ const fakerUser: AddUser.Params = {
 const makeCheckUserExistsByEmailRepository = (): CheckUserExistsByEmailRepository => {
   class CheckUserExistsByEmailRepositoryStub implements CheckUserExistsByEmailRepository {
     async check (email: string): Promise<boolean> {
-      return new Promise((resolve) => resolve(true))
+      return new Promise((resolve) => resolve(false))
     }
   }
   return new CheckUserExistsByEmailRepositoryStub()
@@ -128,5 +128,12 @@ describe('DBAddUser', () => {
     })
     const promise = sut.add(fakerUser)
     expect(promise).rejects.toThrow(new Error())
+  })
+
+  test('Should throws an EmailAlreadyInUseError if already exists a user with the email inserted', () => {
+    const { sut, checkUserExistsByEmailRepository } = makeSut()
+    jest.spyOn(checkUserExistsByEmailRepository, 'check').mockReturnValue(new Promise((resolve) => resolve(true)))
+    const promise = sut.add(fakerUser)
+    expect(promise).rejects.toThrow(new EmailAlrearyInUseError())
   })
 })
