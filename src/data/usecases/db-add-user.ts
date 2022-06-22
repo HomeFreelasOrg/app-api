@@ -1,4 +1,4 @@
-import { AddUser } from '../../domain/usecases'
+import { AddUser } from '@/domain/usecases'
 import { EmailAlrearyInUseError, UnderageError } from '../errors'
 import { AddUserRepository, CheckUserExistsByEmailRepository, Encrypter } from '../protocols'
 import { getAgeByBirth } from '../services'
