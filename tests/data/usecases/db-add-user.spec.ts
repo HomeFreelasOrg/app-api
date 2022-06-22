@@ -1,7 +1,7 @@
-import { AddUser } from '../../../domain/usecases'
-import { EmailAlrearyInUseError, UnderageError } from '../../errors'
-import { AddUserRepository, CheckUserExistsByEmailRepository, Encrypter } from '../../protocols'
-import { DBAddUser } from './db-add-user'
+import { AddUser } from '../../../src/domain/usecases'
+import { EmailAlrearyInUseError, UnderageError } from '../../../src/data/errors'
+import { AddUserRepository, CheckUserExistsByEmailRepository, Encrypter } from '../../../src/data/protocols'
+import { DBAddUser } from '../../../src/data/usecases/db-add-user'
 
 interface SutTypes {
   sut: DBAddUser

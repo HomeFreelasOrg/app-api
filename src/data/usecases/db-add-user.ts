@@ -1,7 +1,7 @@
-import { AddUser } from '../../../domain/usecases'
-import { EmailAlrearyInUseError, UnderageError } from '../../errors'
-import { AddUserRepository, CheckUserExistsByEmailRepository, Encrypter } from '../../protocols'
-import { getAgeByBirth } from '../../services'
+import { AddUser } from '../../domain/usecases'
+import { EmailAlrearyInUseError, UnderageError } from '../errors'
+import { AddUserRepository, CheckUserExistsByEmailRepository, Encrypter } from '../protocols'
+import { getAgeByBirth } from '../services'
 
 export class DBAddUser implements AddUser {
   constructor (
