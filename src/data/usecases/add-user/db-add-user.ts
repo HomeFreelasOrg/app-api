@@ -14,13 +14,13 @@ export class DBAddUser implements AddUser {
     const age = getAgeByBirth(user.birth)
 
     if (age < 16) {
-      return new Promise((resolve, reject) => reject(new UnderageError()))
+      throw new UnderageError()
     }
 
     const userAlreadyExists = await this.checkUserExistsByEmailRepository.check(user.email)
 
     if (userAlreadyExists) {
-      return new Promise((resolve, reject) => reject(new EmailAlrearyInUseError()))
+      throw new EmailAlrearyInUseError()
     }
 
     const encryptedPassword = this.encrypter.encrypt(user.password)
