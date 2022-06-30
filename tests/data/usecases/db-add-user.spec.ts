@@ -12,7 +12,6 @@ interface SutTypes {
 
 const fakerUser: AddUser.Params = {
   name: 'any_name',
-  age: 'any_age',
   address: 'any_address',
   email: 'any_mail@mail.com',
   birth: new Date(2000, 9, 5),

@@ -44,7 +44,6 @@ const makeSut = (): SutTypes => {
 const fakerRequest: HttpRequest = {
   body: {
     name: 'any_name',
-    age: 10,
     birth: new Date(2000, 9, 20),
     address: 'any_address',
     email: 'any_email@mail.com',
@@ -69,7 +68,6 @@ describe('SignUpController', () => {
       badRequest(
         new MissingParamError([
           'name',
-          'age',
           'birth',
           'address',
           'email',
@@ -114,7 +112,6 @@ describe('SignUpController', () => {
     await sut.handle(request)
     expect(addSpy).toHaveBeenCalledWith({
       name: 'any_name',
-      age: 10,
       birth: new Date(2000, 9, 20),
       address: 'any_address',
       email: 'any_email@mail.com',
@@ -130,7 +127,6 @@ describe('SignUpController', () => {
       ok({
         id: 'any_id',
         name: 'any_name',
-        age: 10,
         birth: new Date(2000, 9, 20),
         address: 'any_address',
         email: 'any_email@mail.com',

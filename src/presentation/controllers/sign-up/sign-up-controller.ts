@@ -18,7 +18,6 @@ export class SignUpController implements Controller {
     try {
       const requiredFields = [
         'name',
-        'age',
         'birth',
         'address',
         'email',
