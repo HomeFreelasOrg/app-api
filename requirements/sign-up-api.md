@@ -12,7 +12,6 @@
 
 - id (UUID);
 - name (string);
-- age (string);
 - birth (date);
 - address (string);
 - email (string);
